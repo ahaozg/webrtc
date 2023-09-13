@@ -1,0 +1,58 @@
+.cc-dialog_wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  font-size: 0;
+  text-align:center;
+  vertical-align:middle;
+  background-color: rgba(0, 0, 0, .3);
+
+  &:after {
+    display: inline-block;
+    width: 0;
+    height: 100%;
+    content: "center";
+    vertical-align: middle;
+    overflow: hidden;
+  }
+
+  .cc-dialog_inner {
+    display: inline-block;
+    background: #17171E;
+    box-shadow: 0 3px 5px 0 rgba(0,0,0,0.5);
+    border-radius: 5px;
+    border: 1px solid @borderColorBright;
+    font-size: @fontSizeSmall;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .cc-dialog_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 @gapBig;
+    line-height: 48px;
+    font-size: @fontSizeBase;
+    border-bottom: 1px solid @borderColorDark;
+
+    .l-left {
+      flex: 1;
+    }
+
+    .l-right {
+      flex: none;
+    }
+  }
+
+  .cc-dialog_footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 74px;
+    border-top: 1px solid @borderColorDark;
+  }
+}

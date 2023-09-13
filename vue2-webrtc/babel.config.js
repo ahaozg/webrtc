@@ -1,0 +1,15 @@
+module.exports = {
+  presets: [
+    "@babel/preset-env",
+    "@vue/babel-preset-jsx",
+  ],
+  plugins: [
+    [
+      '@babel/plugin-transform-runtime',
+      {"corejs": 2}
+    ],
+    "@babel/plugin-proposal-optional-chaining",
+    "@babel/plugin-proposal-nullish-coalescing-operator",
+    "@babel/plugin-transform-modules-commonjs"
+  ]
+}

@@ -1,0 +1,281 @@
+@font-face {
+  font-family: 'rtc';
+  src:  url('fonts/rtc.eot?fg4pqi');
+  src:  url('fonts/rtc.eot?fg4pqi#iefix') format('embedded-opentype'),
+    url('fonts/rtc.ttf?fg4pqi') format('truetype'),
+    url('fonts/rtc.woff?fg4pqi') format('woff'),
+    url('fonts/rtc.svg?fg4pqi#rtc') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="rtc-icon-"], [class*=" rtc-icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'rtc' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.rtc-icon-loading:before {
+  content: "\e900";
+}
+.rtc-icon-square:before {
+  content: "\e901";
+}
+.rtc-icon-logo:before {
+  content: "\e902";
+}
+.rtc-icon-device-detection:before {
+  content: "\e903";
+}
+.rtc-icon-device-report:before {
+  content: "\e904";
+}
+.rtc-icon-bgm-play:before {
+  content: "\e92b";
+}
+.rtc-icon-bgm-pause:before {
+  content: "\e92f";
+}
+.rtc-icon-card:before {
+  content: "\e926";
+}
+.rtc-icon-live-hide:before {
+  content: "\e925";
+}
+.rtc-icon-live-show:before {
+  content: "\e928";
+}
+.rtc-icon-identity:before {
+  content: "\e91d";
+}
+.rtc-icon-os:before {
+  content: "\e914";
+}
+.rtc-icon-delay:before {
+  content: "\e916";
+}
+.rtc-icon-packet:before {
+  content: "\e917";
+}
+.rtc-icon-network-quality:before {
+  content: "\e919";
+}
+.rtc-icon-browser-support:before {
+  content: "\e91b";
+}
+.rtc-icon-browser-version:before {
+  content: "\e91c";
+}
+.rtc-icon-live-mark:before {
+  content: "\e908";
+}
+.rtc-icon-text-tip:before {
+  content: "\e909";
+}
+.rtc-icon-upload:before {
+  content: "\e907";
+}
+.rtc-icon-zoom-in:before {
+  content: "\e906";
+}
+.rtc-icon-add:before {
+  content: "\e905";
+}
+.rtc-icon-copy:before {
+  content: "\e90a";
+}
+.rtc-icon-time:before {
+  content: "\e90b";
+}
+.rtc-icon-user-setting:before {
+  content: "\e90c";
+}
+.rtc-icon-pause:before {
+  content: "\e90d";
+}
+.rtc-icon-play:before {
+  content: "\e90e";
+}
+.rtc-icon-more:before {
+  content: "\e91e";
+}
+.rtc-icon-arrow:before {
+  content: "\e90f";
+}
+.rtc-icon-add-plus:before {
+  content: "\e935";
+}
+.rtc-icon-quit:before {
+  content: "\e92d";
+}
+.rtc-icon-search:before {
+  content: "\e92a";
+}
+.rtc-icon-success-plus:before {
+  content: "\e913";
+}
+.rtc-icon-error:before {
+  content: "\e94a";
+}
+.rtc-icon-check:before {
+  content: "\e959";
+}
+.rtc-icon-close:before {
+  content: "\e91f";
+}
+.rtc-icon-edit:before {
+  content: "\e942";
+}
+.rtc-icon-setting:before {
+  content: "\e927";
+}
+.rtc-icon-warning-plus:before {
+  content: "\e92c";
+}
+.rtc-icon-abnormal:before {
+  content: "\e920";
+}
+.rtc-icon-success:before {
+  content: "\e921";
+}
+.rtc-icon-timing:before {
+  content: "\e923";
+}
+.rtc-icon-camera-1:before {
+  content: "\e93b";
+}
+.rtc-icon-user-bg:before {
+  content: "\e924";
+}
+.rtc-icon-camera:before {
+  content: "\e929";
+}
+.rtc-icon-network-plus:before {
+  content: "\e92e";
+}
+.rtc-icon-network:before {
+  content: "\e939";
+}
+.rtc-icon-network-mini:before {
+  content: "\e922";
+}
+.rtc-icon-signal:before {
+  content: "\e93e";
+}
+.rtc-icon-im:before {
+  content: "\e940";
+}
+.rtc-icon-layout:before {
+  content: "\e910";
+}
+.rtc-icon-layout-plus:before {
+  content: "\e943";
+}
+.rtc-icon-layout-square:before {
+  content: "\e944";
+}
+.rtc-icon-camera-plus:before {
+  content: "\e941";
+}
+.rtc-icon-camera-plus-close:before {
+  content: "\e911";
+}
+.rtc-icon-camera-mini:before {
+  content: "\e915";
+}
+.rtc-icon-voice:before {
+  content: "\e945";
+}
+.rtc-icon-voice-close:before {
+  content: "\e946";
+}
+.rtc-icon-microphone-1:before {
+  content: "\e94c";
+}
+.rtc-icon-microphone-bottom:before {
+  content: "\e951";
+}
+.rtc-icon-microphone:before {
+  content: "\e937";
+}
+.rtc-icon-microphone-close:before {
+  content: "\e918";
+}
+.rtc-icon-CPU:before {
+  content: "\e956";
+}
+.rtc-icon-fps:before {
+  content: "\e957";
+}
+.rtc-icon-monitor:before {
+  content: "\e912";
+}
+.rtc-icon-frame-rate:before {
+  content: "\e91a";
+}
+.rtc-icon-users:before {
+  content: "\e930";
+}
+.rtc-icon-user:before {
+  content: "\e958";
+}
+.rtc-icon-user-plus:before {
+  content: "\e94b";
+}
+.rtc-icon-share:before {
+  content: "\e931";
+}
+.rtc-icon-SD:before {
+  content: "\e95a";
+}
+.rtc-icon-code-rate:before {
+  content: "\e95b";
+}
+.rtc-icon-wifi-unknown .path1:before {
+  content: "\e932";
+  color: rgb(93, 93, 97);
+}
+.rtc-icon-wifi-unknown .path2:before {
+  content: "\e933";
+  margin-left: -1.5em;
+  color: rgb(255, 255, 255);
+  opacity: 0.3008;
+}
+.rtc-icon-wifi-unknown .path3:before {
+  content: "\e934";
+  margin-left: -1.5em;
+  color: rgb(93, 93, 97);
+}
+.rtc-icon-wifi-good:before {
+  content: "\e95c";
+}
+.rtc-icon-wifi-fair .path1:before {
+  content: "\e95d";
+  color: rgb(250, 112, 0);
+}
+.rtc-icon-wifi-fair .path2:before {
+  content: "\e95e";
+  margin-left: -1.4375em;
+  color: rgb(255, 255, 255);
+  opacity: 0.3008;
+}
+.rtc-icon-wifi-poor .path1:before {
+  content: "\e962";
+  color: rgb(250, 0, 0);
+}
+.rtc-icon-wifi-poor .path2:before {
+  content: "\e963";
+  margin-left: -1.4375em;
+  color: rgb(255, 255, 255);
+  opacity: 0.3008;
+}

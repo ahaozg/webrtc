@@ -1,0 +1,62 @@
+.vcc-poptip {
+    display: none;
+    z-index: 1;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.12);
+
+    &[data-show] {
+        display: block;
+    }
+
+    .vcc-poptip-arrow {
+        position: absolute;
+        z-index: -1;
+        width: 10px;
+        height: 10px;
+
+        &::before {
+            content: "";
+            visibility: visible;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            width: 10px;
+            height: 10px;
+            box-shadow: 0 0 18px 0 rgba(0, 0, 0, 0.2);
+            background: rgb(255, 255, 255);
+            transform: translateX(0) rotate(45deg);
+            transform-origin: center center;
+            transition: transform 0.2s ease-out 0s, visibility 0.2s ease-out 0s;
+        }
+    }
+
+    .vcc-poptip-inner {
+        background-color: #fff;
+    }
+
+    //&[data-popper-reference-hidden],
+    //&[data-popper-escaped] {
+    //    visibility: hidden;
+    //    pointer-events: none;
+    //
+    //    .vcc-poptip-arrow {
+    //        display: none;
+    //    }
+    //}
+
+    &[data-popper-placement^="top"] .vcc-poptip-arrow {
+        bottom: -4px;
+    }
+
+    &[data-popper-placement^="bottom"] .vcc-poptip-arrow {
+        top: -4px;
+    }
+
+    &[data-popper-placement^="left"] .vcc-poptip-arrow {
+        right: -4px;
+    }
+
+    &[data-popper-placement^="right"] .vcc-poptip-arrow {
+        left: -4px;
+    }
+}

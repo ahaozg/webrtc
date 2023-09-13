@@ -1,0 +1,484 @@
+/**
+ * @author haozg
+ * @version 1.0.0
+ * @createTime   2022/2/18
+ * @updateTime   2022/2/18
+ * @description  组件级别的样式
+ */
+
+.c-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  min-height: 18px;
+  gap: @gapMini;
+  cursor: pointer;
+}
+
+// 基础按钮
+.c-btn {
+  display: inline-block;
+  padding: 0 @gapBig;
+  height: @btnHeightBase;
+  line-height: @btnHeightBase;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  // 最小
+  &.c-btn--mini {
+    height: @btnHeightMini;
+    line-height: @btnHeightMini;
+  }
+
+  // 稍小一点
+  &.c-btn--small {
+    height: @btnHeightSmall;
+    line-height: @btnHeightSmall;
+  }
+
+  // 稍大一点
+  &.c-btn--big {
+    height: @btnHeightBig;
+    line-height: @btnHeightBig;
+  }
+
+  // 默认的基础按钮
+  &.c-btn-default {
+    color: #fff;
+    background-color: @btnBgColorDefault;
+    border-radius: 2px;
+    border: 1px solid @btnBorderColorDefault;
+
+    &:hover {
+      background-color: @btnBgColorDefaultHover;
+    }
+
+    &.disable {
+      color: @btnColorDefaultDisable;
+      background-color: @btnBgColorDefaultDisable;
+      border-color: @btnBorderColorDefaultDisable;
+      cursor: not-allowed;
+    }
+  }
+
+  // 主要的基础按钮
+  &.c-btn-primary {
+    color: @btnColorPrimary;
+    background-color: @btnBgColorPrimary;
+    border-radius: 2px;
+
+    &:hover {
+      background-color: @btnBgColorPrimaryHover;
+    }
+
+    &.disable {
+      color: @btnColorPrimaryDisable;
+      background-color: @btnBgColorPrimaryDisable;
+      cursor: not-allowed;
+    }
+  }
+
+  &.c-btn-warn {
+    color: #fff;
+    background-color: @btnBgColorWarn;
+    border-radius: 2px;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &.disable {
+      color: @btnColorWarnDisable;
+      background-color: @btnBgColorWarnDisable;
+      opacity: 1;
+      cursor: not-allowed;
+    }
+  }
+
+  // 错误按钮
+  &.c-btn-error {
+    color: #fff;
+    background-color: @btnBgColorError;
+    border-radius: 2px;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &.disable {
+      color: @btnColorErrorDisable;
+      background-color: @btnBgColorErrorDisable;
+      opacity: 1;
+      cursor: not-allowed;
+    }
+  }
+
+  // 相邻按钮8px
+  & + .c-btn {
+    margin-left: @gapBig;
+  }
+}
+
+.c-btn-icon {
+  display: inline-block;
+  padding: 0 @gapBig;
+  cursor: pointer;
+
+  // 带icon的水平按钮
+  &.c-btn-icon--horizon {
+    padding: 0 12px;
+    border-radius: 2px;
+
+    i {
+      margin-right: 7px;
+    }
+  }
+
+  // 带icon的垂直按钮
+  &.c-btn-icon--vertical {
+    position: relative;
+    //padding: 38px 16px 10px 16px;
+    min-width: 40px;
+    color: #CFD8E1;
+    line-height: 14px;
+    text-align: center;
+    background-position: center top 10px;
+    overflow: hidden;
+
+    //i:not(.rtc-icon-caret-bottom) {
+    //  position: absolute;
+    //  top: 12px;
+    //  left: 0;
+    //  right: 0;
+    //  margin: 0 auto;
+    //  font-size: 18px;
+    //}
+
+    .c-btn-icon--top {
+      position: absolute;
+      top: 9px;
+      left: 0;
+      right: 0;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 1px;
+    }
+
+    .c-btn-icon--text {
+      position: relative;
+    }
+
+    .svg-icon-wrap {
+      position: relative;
+      z-index: 1;
+    }
+
+    .svg-icon {
+      position: relative;
+      width: 24px;
+      height: 24px;
+      z-index: 1;
+    }
+
+    .c-arrow {
+      padding-left: 6px;
+      width: 24px;
+      height: 100%;
+
+      &:hover {
+        background-color: #212124;
+        box-shadow: 0 0 1000px 1000px #333438;
+      }
+    }
+
+    //.rtc-icon-camera-mini {
+    //  font-size: 24px;
+    //}
+    .l-bottom {
+      position: relative;
+    }
+
+    &:hover {
+      background-color: #333438;
+    }
+
+    &.disable {
+      cursor: not-allowed;
+    }
+  }
+}
+
+.c-icon-question {
+  display: inline-block;
+  width: 24px;
+  height: 26px;
+  background-image: url("./../../assets/images/icon-question-mark.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  text-indent: -9999px;
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: top;
+  text-align: left;
+}
+
+.vcc-poptip.rtc-poptip {
+
+  .vcc-poptip-inner {
+    background-color: transparent;
+  }
+
+  .vcc-poptip-arrow::before {
+    background: #333438;
+  }
+
+  .device-popover {
+    padding: 16px;
+    background: #333438;
+    box-shadow: 0 3px 5px 0 rgba(0,0,0,.5);
+    border-radius: 5px;
+    border: 1px solid #414852;
+    color: #cdd8e2;
+    min-width: 200px;
+    .device-popover__title {
+      margin-bottom: 8px;
+      font-weight: bold;
+      line-height: 24px;
+    }
+
+    .device-popover__content {
+      line-height: 20px;
+      white-space: pre-wrap;
+      font-size: 14px;
+    }
+  }
+}
+
+.c-help-body {
+  background: #333438;
+  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.06);
+  padding: 4px 0;
+  width: 100%;
+  height: max-content;
+  max-height: 80vh;
+  overflow: auto;
+  .c-help-text-content {
+    padding: 0 16px;
+    width: 100%;
+    .c-help-text-title {
+      width: 100%;
+      height: 45px;
+      line-height: 45px;
+      font-size: 24px;
+      color: #cdd8e2;
+      font-weight: bold;
+      border-bottom: 1px solid #414852;
+    }
+    .c-help-text-list {
+      padding: 16px 0;
+      width: 100%;
+      .c-help-text-item {
+        width: 100%;
+        color: #cdd8e2;
+        font-size: 16px;
+        > p {
+          line-height: 40px;
+        }
+      }
+    }
+  }
+
+  img {
+    max-width: 100%;
+  }
+}
+
+.c-arrow {
+  display: inline-flex;
+  position: relative;
+  border-radius: 4px;
+  &:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    border-top: 6px solid #fff;
+    border-right: 6px solid transparent;
+    border-bottom: 0 solid transparent;
+    border-left: 6px solid transparent;
+    transition: transform .1s;
+  }
+
+  &.r180:before {
+    transform: translateY(-50%) rotate(0.5turn);
+  }
+}
+
+.c-dropdown {
+  .c-dropdown-inner {
+    padding: 8px 16px;
+    background: #333438;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    border: 1px solid #414852;
+    color: #cdd8e2;
+    min-width: 200px;
+
+    .item {
+      line-height: 32px;
+      cursor: pointer;
+
+      &.active {
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.c-device-infos {
+  display: flex;
+  flex-direction: column;
+  padding: 0 30px;
+  .device-info {
+    display: flex;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+}
+
+.rtc-poptip.rtc-poptip-second {
+  z-index: 2;
+}
+
+.c-blue-tip {
+  position: relative;
+  padding-left: 16px;
+  padding-right: 40px;
+  height: 40px;
+  line-height: 40px;
+  white-space: nowrap;
+  font-size: 14px;
+  color: #fff;
+  background-color: #0068B6;
+  border-radius: 2px;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-top: 10px solid #0068B6;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+  }
+  .rtc-icon-close {
+    position: absolute;
+    right: 13px;
+    top: 50%;
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+}
+
+.c-close {
+  position: relative;
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 20px;
+    background-color: #fff;
+  }
+  &::before {
+    transform: rotate(45deg);
+  }
+  &::after {
+    transform: rotate(-45deg);
+  }
+}
+
+.c-microphone-boxes {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: @gapBig;
+
+  .c-microphone-item {
+    width: 7px;
+    height: 19px;
+    border: 1px solid #404040;
+
+    &.active {
+      background: #00B578;
+      border-color: #00B578;
+    }
+  }
+}
+
+.c-camera {
+  position: relative;
+  margin: 0 auto;
+  width: 358px;
+  height: 201px;
+  border-radius: 2px;
+  border: 1px solid #5d6071;
+  .c-camera--empty {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: rgba(255, 255, 255, 0.25);
+    line-height: 14px;
+    background: #303135;
+
+    .rtc-icon-camera-plus-close {
+      margin-bottom: 13px;
+      font-size: 40px;
+    }
+
+    .c-camera--emptyText {
+      padding: 0 20px;
+      min-height: 14px;
+      line-height: 18px;
+      text-align: center;
+    }
+  }
+}
+
+.video-player.stream-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  object-fit: cover !important;
+  transform: rotateY(0) rotate(1turn)!important;
+}
+
+.rtc-icon-loading {
+  display: inline-flex;
+  animation: loading-rotate 2s linear infinite;
+}
