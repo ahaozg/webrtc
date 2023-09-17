@@ -78,9 +78,16 @@ function getWebpackConfig(configOptions) {
       path: path.resolve(__dirname, outputPath),
       filename: assetsPath('[name].js'),
       chunkFilename: assetsPath('[id].js'),
+      library: 'ccRtc',
+      libraryTarget: 'umd',
     },
     externals: {
-      'trtc-js-sdk': 'TRTC'
+      'trtc-js-sdk': {
+        root: 'TRTC',
+        commonjs: 'trtc-js-sdk',
+        commonjs2: 'trtc-js-sdk',
+        amd: 'trtc-js-sdk',
+      },
     },
     module: {
       rules: [
