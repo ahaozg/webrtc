@@ -103,11 +103,12 @@ const webpackConfig = merge(baseWebpackConfig, {
     // enable scope hoisting
     new webpack.optimize.ModuleConcatenationPlugin(),
     // copy custom static assets
-    new CopyWebpackPlugin([{
-      from: path.resolve(__dirname, '../static'),
-      to: config.build.assetsSubDirectory,
-      ignore: ['.*']
-    }])
+    new CopyWebpackPlugin({
+      patterns: [{
+        from: path.resolve(__dirname, '../static'),
+        to: config.dev.assetsSubDirectory,
+      }]
+    }),
   ]
 })
 

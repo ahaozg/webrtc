@@ -40,6 +40,8 @@ const assetsPath = function (_path) {
   return path.posix.join('static', _path);
 };
 
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+
 function getWebpackConfig(configOptions) {
   console.log(chalk.blue('【当前构建参数是】：' + JSON.stringify(configOptions, null, 4)));
   const options = configOptions || {
@@ -76,6 +78,9 @@ function getWebpackConfig(configOptions) {
       path: path.resolve(__dirname, outputPath),
       filename: assetsPath('[name].js'),
       chunkFilename: assetsPath('[id].js'),
+    },
+    externals: {
+      'trtc-js-sdk': 'TRTC'
     },
     module: {
       rules: [
@@ -174,6 +179,7 @@ function getWebpackConfig(configOptions) {
       }),
       // enable scope hoisting
       new webpack.optimize.ModuleConcatenationPlugin(),
+      new BundleAnalyzerPlugin(),
     ],
     node: {
       // prevent webpack from injecting useless setImmediate polyfill because Vue
