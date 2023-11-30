@@ -80,7 +80,7 @@ const directive = {
      *     return false;
      * }
      */
-        if (el.getAttribute('data-transfer') !== 'true') { // 兼容IE10 -> http://code.thunisoft.com/artery/artery6/issues/29
+        if (el.getAttribute('data-transfer') !== 'true') {
             return false;
         }
         // need to make sure children are done updating (vs. `update`)

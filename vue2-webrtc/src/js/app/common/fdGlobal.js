@@ -1,13 +1,3 @@
-/**
- * @file  fdGlobal.js
- * @version 1.0.1
- * @author wuwg  <wuwg@thunisoft.com>
- * @createTime  2019-08-13
- * @copyright thunisoft fd
- * @see [jsDoc中文文档]{@link  http://www.dba.cn/book/jsdoc/JSDOCKuaiBiaoQianBLOCKTAGS/CONSTRUCTS.html}
- * @description fdGlobal 这是全局的一个对象，里面有各种工具类
- * @updateTime  2019-08-13
- */
 // 函数防抖
 import debounce from '@/components/tools/extend/debounce.js';
 // 函数节流
@@ -33,20 +23,8 @@ import axios from 'axios';
 // 模拟树数据
 import mockTreeData from '@/components/tools/extend/mockTreeData.js';
 
-/**
- * @constructor
- * @version 1.0.1
- * @author wuwg  <wuwg@thunisoft.com>
- * @createTime:2019-08-13,
- * @updateTime:2019-08-13
- * @copyright thunisoft fd
- * @description
- * ##这是全局方法,
- * @see [jsDoc中文文档]{@link  http://www.dba.cn/book/jsdoc/JSDOCKuaiBiaoQianBLOCKTAGS/CONSTRUCTS.html}
- * @see [个人博客]{@link  http://www.wuweigang.com}
- */
 function FdGlobal() {
-  this.author = 'wuwg';
+  this.author = 'haozg';
 }
 
 FdGlobal.prototype = {
