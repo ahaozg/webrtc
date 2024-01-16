@@ -64,12 +64,14 @@ class Mic extends MixinsClass(BaseCommon) {
     this.publishMicStreamSuccessCbs.forEach(cb => {
       cb && cb();
     });
+    this.publishMicStreamSuccessCbs = [];
   }
 
   publishMicStreamErrorHandler(data) {
     this.publishMicStreamErrorCbs.forEach(cb => {
       cb && cb(data);
     });
+    this.publishMicStreamErrorCbs = [];
   }
 
   switchMic(microphoneId) {

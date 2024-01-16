@@ -192,7 +192,11 @@ export function deepCopy(obj, cache = []) {
   });
 
   Object.keys(obj).forEach(key => {
-    copy[key] = deepCopy(obj[key], cache);
+    if (key === '__vue__') {
+      copy[key] = '__vue__';
+    } else {
+      copy[key] = deepCopy(obj[key], cache);
+    }
   });
 
   return copy;

@@ -3,6 +3,9 @@ import RtcCloudService from './RtcCloudService';
 import RtcDeviceService from './RtcDeviceService';
 
 import emitter, {RtcCoreEvents} from '../common/emitter/event';
+import logger from '../common/logger';
+
+const logPrefix = '[RtcCore]';
 
 class RtcCore {
   static instance = null;
@@ -109,13 +112,19 @@ class RtcCore {
           await this.publishMicStream({
             userId: this.state.userId,
             microphoneId: this.state.microphone.deviceId,
-          });
+          })
+            .catch(e => {
+              logger.error(`${logPrefix}.publishMicStream error：`, e);
+            });
         }
         if (this.state.enableCamera && this.state.camera.has) {
           await this.publishCameraStream({
             userId: this.state.userId,
             cameraId: this.state.camera.deviceId,
-          });
+          })
+            .catch(e => {
+              logger.error(`${logPrefix}.publishCameraStream error：`, e);
+            });
         }
       })
         .catch(e => {

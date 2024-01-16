@@ -54,12 +54,14 @@ class Camera extends MixinsClass(BaseCommon) {
     this.publishCameraStreamSuccessCbs.forEach(cb => {
       cb && cb();
     });
+    this.publishCameraStreamSuccessCbs = [];
   }
 
   publishCameraStreamErrorHandler(data) {
     this.publishCameraStreamErrorCbs.forEach(cb => {
       cb && cb(data);
     });
+    this.publishCameraStreamErrorCbs = [];
   }
 
   switchCamera(cameraId) {

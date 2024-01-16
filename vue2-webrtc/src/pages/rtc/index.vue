@@ -1,10 +1,10 @@
 <template>
   <div class="rtc-wrap">
     <div class="model" v-if="!isPreData">
-      <input type="text" placeholder="sdkAppid" v-model="baseInfo.sdkAppid">
-      <input type="text" placeholder="secretkey" v-model="baseInfo.secretkey">
-      <input type="text" placeholder="房间号" v-model="baseInfo.roomId">
-      <input type="text" placeholder="userId" v-model="baseInfo.userId">
+      <input type="text" placeholder="sdkAppid" v-model="baseInfo.sdkAppid" @keydown.enter="judgeEnterRoom">
+      <input type="text" placeholder="secretkey" v-model="baseInfo.secretkey" @keydown.enter="judgeEnterRoom">
+      <input type="text" placeholder="房间号" v-model="baseInfo.roomId" @keydown.enter="judgeEnterRoom">
+      <input type="text" placeholder="userId" v-model="baseInfo.userId" @keydown.enter="judgeEnterRoom">
       <button @click="judgeEnterRoom">进入房间</button>
     </div>
     <ccRtc
@@ -132,6 +132,7 @@ export default {
      * @return {void}
      */
     async init() {
+      this.presetBaseInfo();
       // 测试相关按钮会不会隐藏
       // setTimeout(() => {
       //   this.showScreenShareBtn = false;
@@ -183,6 +184,15 @@ export default {
       // this.judgeEnterRoom();
     },
 
+    presetBaseInfo() {
+      const query = this.$route.query;
+      const baseInfo = this.$options.data().baseInfo;
+      this.baseInfo.roomId = query.roomId || baseInfo.roomId;
+      this.baseInfo.userId = query.userId || baseInfo.userId;
+      this.baseInfo.sdkAppid = Number(query.id || baseInfo.sdkAppid);
+      this.baseInfo.secretkey = query.key || baseInfo.secretkey;
+    },
+
     judgeEnterRoom() {
       if (this.baseInfo.roomId && this.baseInfo.userId && this.baseInfo.sdkAppid && this.baseInfo.secretkey) {
         const basicInfo = getBasicInfo(this.baseInfo.sdkAppid, this.baseInfo.secretkey, this.baseInfo.userId);
@@ -209,6 +219,15 @@ export default {
         if (enterErr) {
           console.error('enterRoom error: ', err);
         } else {
+          this.$router.replace({
+            path: this.$route.path,
+            query: {
+              id: this.baseInfo.sdkAppid,
+              key: this.baseInfo.secretkey,
+              roomId: this.baseInfo.roomId,
+              userId: this.baseInfo.userId,
+            },
+          });
           console.log('成功加入房间');
         }
       });
