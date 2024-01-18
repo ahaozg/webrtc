@@ -114,7 +114,7 @@ class RtcCore {
             microphoneId: this.state.microphone.deviceId,
           })
             .catch(e => {
-              logger.error(`${logPrefix}.publishMicStream error：`, e);
+              logger.error(`${logPrefix}.publishMicStream error：`, e, e.code, e.message, e.data);
             });
         }
         if (this.state.enableCamera && this.state.camera.has) {
@@ -123,7 +123,7 @@ class RtcCore {
             cameraId: this.state.camera.deviceId,
           })
             .catch(e => {
-              logger.error(`${logPrefix}.publishCameraStream error：`, e);
+              logger.error(`${logPrefix}.publishCameraStream error：`, e, e.code, e.message, e.data);
             });
         }
       })

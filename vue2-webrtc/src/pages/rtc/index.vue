@@ -227,7 +227,7 @@ export default {
               roomId: this.baseInfo.roomId,
               userId: this.baseInfo.userId,
             },
-          });
+          }).catch(e => e);
           console.log('成功加入房间');
         }
       });

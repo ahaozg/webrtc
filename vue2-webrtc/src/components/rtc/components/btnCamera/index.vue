@@ -132,7 +132,7 @@ export default {
     async onClickCamera() {
       const hasCameraVideo = rtcCore.hasLocalStreamVideo();
       if (hasCameraVideo) {
-        const result = await rtcCore.setLocalStreamMute({
+        const result = rtcCore.setLocalStreamMute({
           tag: StreamTag.CAMERA,
           mute: this.storeRoom.currentUser?.cameraOpen,
         });

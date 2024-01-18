@@ -1,7 +1,6 @@
 import TRTC from 'trtc-js-sdk';
 import logger from '../common/logger';
 import {RoomErrorCode, RoomErrorMessage, StreamTag} from '../constants/constant';
-import emitter, {RtcCoreEvents} from '../common/emitter/event';
 import {standardizationError} from '../utils/utils';
 
 // 输出 DEBUG 以上日志等级
@@ -25,113 +24,114 @@ class BaseCommon {
 
   remoteStreams = new Map();
 
-  publishStreamQueue = [];
-
   async checkSystemRequirements() {
     return await this.TRTC.checkSystemRequirements();
   }
 
-  publishStream(params) {
-    return new Promise(async (resolve, reject) => {
-      const {
-        userId,
-        // StreamTag
-        tag,
-        microphoneId,
-        cameraId,
-        videoProfile,
-        // eslint-disable-next-line no-unused-vars
-        mute = true,
-        audioSource,
-        videoSource,
-        successCb,
-        errorCb,
-      } = params;
-      try {
-        logger.log(`${logPrefix}.publishStream`, params);
-        if (this.localStreamPublishing) {
-          errorCb && errorCb({
-            code: RoomErrorCode.LOCAL_STREAM_PUBLISHING,
-            message: RoomErrorMessage.LOCAL_STREAM_PUBLISHING,
-          });
-          this.publishStreamQueue.push({
-            params,
-            resolve,
-            reject,
-          });
-          return;
+  publishStreamQueue = Promise.resolve();
+  enqueuePublishStream(params) {
+    const result = this.publishStreamQueue.then(() => this.publishStream(params));
+    this.publishStreamQueue = result.catch(() => {
+      //
+    });
+    return result;
+  }
+
+  async publishStream(params) {
+    const {
+      userId,
+      tag,
+      microphoneId,
+      cameraId,
+      videoProfile,
+      mute = true,
+      audioSource,
+      videoSource,
+    } = params;
+    try {
+      logger.log(`${logPrefix}.publishStream`, params);
+      if (this.localStreamPublishing) {
+        return;
+      }
+      this.localStreamPublishing = true;
+      const config = {userId};
+      for (const key in params) {
+        const keys = ['audio', 'video', 'audioSource', 'videoSource'];
+        if (keys.includes(key) && typeof params[key] !== 'undefined') {
+          config[key] = params[key];
         }
-        this.localStreamPublishing = true;
-        const config = {userId};
-        for (const key in params) {
-          const keys = ['audio', 'video', 'audioSource', 'videoSource'];
-          if (keys.includes(key) && typeof params[key] !== 'undefined') {
-            config[key] = params[key];
-          }
-        }
-        let isDefault = false;
-        switch (tag) {
-          case StreamTag.MIC:
-            config.audio = true;
-            config.video = false;
-            config.microphoneId = microphoneId;
-            break;
-          case StreamTag.CAMERA:
-            config.audio = false;
-            config.video = true;
-            config.cameraId = cameraId;
-            break;
-          case StreamTag.CUSTOM:
-            config.audioSource = audioSource;
-            config.videoSource = videoSource;
-            break;
-          case StreamTag.SHARE:
-            break;
-          default:
-            isDefault = true;
-            errorCb && errorCb({
-              code: RoomErrorCode.INVALID_PARAM_ERROR,
-              message: RoomErrorMessage.INVALID_PARAM_ERROR,
-            });
-            break;
-        }
-        if (isDefault) {
-          return reject(new Error({
+      }
+      switch (tag) {
+        case StreamTag.MIC:
+          config.audio = true;
+          config.video = false;
+          config.microphoneId = microphoneId;
+          break;
+        case StreamTag.CAMERA:
+          config.audio = false;
+          config.video = true;
+          config.cameraId = cameraId;
+          break;
+        case StreamTag.CUSTOM:
+          config.audioSource = audioSource;
+          config.videoSource = videoSource;
+          break;
+        case StreamTag.SHARE:
+          break;
+        default:
+          logger.error(`${logPrefix}.publishStream ${RoomErrorMessage.INVALID_PARAM_ERROR}`, params, tag);
+          throw {
             code: RoomErrorCode.INVALID_PARAM_ERROR,
             message: RoomErrorMessage.INVALID_PARAM_ERROR,
-          }));
-        }
-        console.log('111111111', config);
-        const localStream = this.TRTC.createStream(config);
-        console.log('2222222');
-        await this.test();
-        console.log('333333');
-        const isError = await localStream.initialize().catch(e => {
-          console.log('c444catch');
+          };
+      }
+      const localStream = this.TRTC.createStream(config);
+      const isError = await localStream.initialize()
+        .then(() => false)
+        .catch(e => {
           standardizationError(e);
+          logger.error(`${logPrefix}.localStream.initialize() e`, e, e.code, e.message, e.name);
           switch (e.name) {
-            case 'NotReadableError':
-              // 提示用户：暂时无法访问摄像头/麦克风，请确保当前没有其他应用请求访问摄像头/麦克风，并重试。
+            case 'NotAllowedError':
+              // 提示用户：提示用户不授权摄像头/麦克风访问无法进行音视频通话
               if (config.audio) {
-                errorCb && errorCb({
+                return {
                   code: RoomErrorCode.MIC_USER_DENY,
                   message: RoomErrorMessage.MIC_USER_DENY,
                   data: e,
-                });
+                };
               } else if (config.video) {
-                errorCb && errorCb({
+                return {
                   code: RoomErrorCode.CAMERA_USER_DENY,
                   message: RoomErrorMessage.CAMERA_USER_DENY,
                   data: e,
-                });
-              } else {
-                errorCb && errorCb({
-                  code: RoomErrorCode.CAMERA_MIC_USER_DENY,
-                  message: RoomErrorMessage.CAMERA_MIC_USER_DENY,
-                  data: e,
-                });
+                };
               }
-              break;
+              return {
+                code: RoomErrorCode.CAMERA_MIC_USER_DENY,
+                message: RoomErrorMessage.CAMERA_MIC_USER_DENY,
+                data: e,
+              };
+            case 'NotReadableError':
+              // 提示用户：暂时无法访问摄像头/麦克风，请确保当前没有其他应用请求访问摄像头/麦克风，并重试。
+              if (config.audio) {
+                return {
+                  code: RoomErrorCode.MIC_IN_USER,
+                  message: RoomErrorMessage.MIC_IN_USER,
+                  data: e,
+                };
+              } else if (config.video) {
+                return {
+                  code: RoomErrorCode.CAMERA_IN_USER,
+                  message: RoomErrorMessage.CAMERA_IN_USER,
+                  data: e,
+                };
+              }
+              return {
+                code: RoomErrorCode.CAMERA_MIC_IN_USER,
+                message: RoomErrorMessage.CAMERA_MIC_IN_USER,
+                data: e,
+              };
             case 'RtcError':
               // DEVICE_NOT_FOUND
               // eslint-disable-next-line no-magic-numbers
@@ -139,111 +139,102 @@ class BaseCommon {
                 // 当前设备没有麦克风或没有摄像头，但尝试采集麦克风、摄像头。
                 // 处理建议：引导用户检查设备的摄像头及麦克风是否正常，业务侧应在进房前的进行设备检测。
                 if (config.audio) {
-                  errorCb && errorCb({
+                  return {
                     code: RoomErrorCode.NOT_FOUND_MIC_ERROR,
                     message: RoomErrorMessage.NOT_FOUND_MIC_ERROR,
                     data: e,
-                  });
+                  };
                 } else if (config.video) {
-                  errorCb && errorCb({
+                  return {
                     code: RoomErrorCode.NOT_FOUND_CAMERA_ERROR,
                     message: RoomErrorMessage.NOT_FOUND_CAMERA_ERROR,
                     data: e,
-                  });
-                } else {
-                  errorCb && errorCb({
-                    code: RoomErrorCode.NOT_FOUND_DEVICE_ERROR,
-                    message: RoomErrorMessage.NOT_FOUND_DEVICE_ERROR,
-                    data: e,
-                  });
+                  };
                 }
-              } else {
-                errorCb && errorCb({
-                  code: RoomErrorCode.UNKNOWN_ERROR,
-                  message: RoomErrorMessage.UNKNOWN_ERROR,
+                return {
+                  code: RoomErrorCode.NOT_FOUND_DEVICE_ERROR,
+                  message: RoomErrorMessage.NOT_FOUND_DEVICE_ERROR,
                   data: e,
-                });
+                };
               }
-              break;
-            default:
-              logger.error(`${logPrefix}.localStream.initialize()`, e);
-              errorCb && errorCb({
+              return {
                 code: RoomErrorCode.UNKNOWN_ERROR,
                 message: RoomErrorMessage.UNKNOWN_ERROR,
                 data: e,
-              });
-              break;
+              };
+            default:
+              return {
+                code: RoomErrorCode.UNKNOWN_ERROR,
+                message: RoomErrorMessage.UNKNOWN_ERROR,
+                data: e,
+              };
           }
-          return true;
         });
-        console.log('44444');
-        if (isError) {
-          return;
+      if (isError) {
+        logger.error(`${logPrefix}.localStream.initialize()`, isError);
+        // return reject(isError);
+        // throw isError;
+        throw Object.assign(new Error(isError.message), isError);
+      }
+      if (!this.localStream) {
+        logger.log(`${logPrefix}.publish 开始发布`, params.tag);
+        this.localStream = localStream;
+      } else {
+        logger.log(`${logPrefix}.publish 开始更新`, params.tag);
+        const isAudio = tag === StreamTag.MIC || (tag === StreamTag.CUSTOM && audioSource);
+        const isVideo = tag === StreamTag.CAMERA || (tag === StreamTag.CUSTOM && videoSource);
+        const newTrack = isAudio ? localStream.getAudioTrack() : localStream.getVideoTrack();
+        const isErr = await this.updateLocalStream({
+          newTrack,
+          isAudio,
+          isVideo,
+        })
+          .then(() => false)
+          .catch(e => e);
+        if (isErr) {
+          // return reject(isErr);
+          throw isErr;
         }
-        if (!this.localStream) {
-          logger.log(`${logPrefix}.publish 开始发布`, params.tag);
-          this.localStream = localStream;
-        } else {
-          logger.log(`${logPrefix}.publish 开始更新`, params.tag);
-          const isAudio = tag === StreamTag.MIC || (tag === StreamTag.CUSTOM && audioSource);
-          const isVideo = tag === StreamTag.CAMERA || (tag === StreamTag.CUSTOM && videoSource);
-          const newTrack = isAudio ? localStream.getAudioTrack() : localStream.getVideoTrack();
-          await this.updateLocalStream({
-            newTrack,
-            isAudio,
-            isVideo,
-          });
-        }
-        await this.setLocalStreamMute(params);
-        if (!this.localStreamPublishState) {
-          await this.client.publish(this.localStream).then(() => {
+      }
+      this.setLocalStreamMute(params);
+      if (!this.localStreamPublishState) {
+        await this.client.publish(this.localStream)
+          .then(() => {
             logger.log(`${logPrefix}.publish 发布成功`, params.tag);
             this.localStreamPublishState = true;
-            successCb && successCb();
+            this.localStreamPublishing = false;
+            console.log('resolve !!!');
+            // resolve();
           })
-            .catch(e => {
-              standardizationError(e);
-              logger.error(`${logPrefix}.publish 发布失败`, params.tag, e);
-              this.localStreamPublishState = false;
-              errorCb && errorCb({
-                code: RoomErrorCode.LOCAL_STREAM_PUBLISH_ERROR,
-                message: RoomErrorMessage.LOCAL_STREAM_PUBLISH_ERROR,
-                data: e,
-              });
-            });
-        }
-        this.localStreamPublishing = false;
-        resolve();
-        if (this.publishStreamQueue.length) {
-          const first = this.publishStreamQueue.shift();
-          this.publishStream(first.params)
-            .then(res => {
-              first.resolve(res);
-            })
-            .catch(e => {
-              first.reject(e);
-            });
-        }
-      } catch (e) {
-        console.log('eeeeeeeeeeee', e);
-        standardizationError(e);
-        this.localStreamPublishing = false;
-        errorCb && errorCb({
-          code: RoomErrorCode.UNKNOWN_ERROR,
-          message: RoomErrorMessage.UNKNOWN_ERROR,
-          data: e,
-        });
+          .catch(e => {
+            standardizationError(e);
+            logger.error(`${logPrefix}.publish 发布失败`, params.tag, e);
+            this.localStreamPublishState = false;
+            this.localStreamPublishing = false;
+            const reason = {
+              code: RoomErrorCode.LOCAL_STREAM_PUBLISH_ERROR,
+              message: RoomErrorMessage.LOCAL_STREAM_PUBLISH_ERROR,
+              data: e,
+            };
+            // reject(reason);
+            throw reason;
+          });
       }
-    });
-  }
-
-  async test() {
-    await new Promise(resolve => {
-      setTimeout(() => {
-        console.log('test');
-        resolve();
-      }, 1000);
-    });
+      this.localStreamPublishing = false;
+      console.log('end!!!');
+    } catch (e) {
+      logger.error(`${logPrefix}.publishStream try catch`, params, e);
+      if (e.code && e.message) {
+        throw e;
+      }
+      standardizationError(e);
+      this.localStreamPublishing = false;
+      throw {
+        code: RoomErrorCode.UNKNOWN_ERROR,
+        message: RoomErrorMessage.UNKNOWN_ERROR,
+        data: e,
+      };
+    }
   }
 
   updateLocalStream(params) {
@@ -335,7 +326,7 @@ class BaseCommon {
     }
   }
 
-  async setLocalStreamMute({
+  setLocalStreamMute({
     tag,
     mute = true,
     audioSource,

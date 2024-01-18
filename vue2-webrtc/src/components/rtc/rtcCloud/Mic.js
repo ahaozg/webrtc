@@ -7,10 +7,6 @@ import emitter, {RtcCoreEvents} from '../common/emitter/event';
 const logPrefix = '[RtcCloud-Mic]';
 
 class Mic extends MixinsClass(BaseCommon) {
-  //
-  publishMicStreamSuccessCbs = [];
-  publishMicStreamErrorCbs = [];
-
   // eslint-disable-next-line no-magic-numbers
   micIntervalTime = 500;
   micIntervalTimer = null;
@@ -19,59 +15,23 @@ class Mic extends MixinsClass(BaseCommon) {
     userId,
     mute = true,
     microphoneId,
-    successCb,
-    errorCb,
   }) {
     const len = this.state.microphone.deviceList.length;
     logger.log(`${logPrefix}.publishMicStream`, len === 0 ? '暂无麦克风设备' : '有麦克风设备');
-    if (successCb) {
-      this.publishMicStreamSuccessCbs.push(successCb);
-    }
-    if (errorCb) {
-      this.publishMicStreamErrorCbs.push(errorCb);
-    }
     if (this.state.microphone.deviceList.length === 0) {
-      this.publishMicStreamErrorHandler({
+      const reason = {
         code: RoomErrorCode.NOT_FOUND_MIC_ERROR,
         message: RoomErrorMessage.NOT_FOUND_MIC_ERROR,
-      });
-      return;
+      };
+      return Promise.reject(reason);
     }
 
-    return this.publishStream({
+    return this.enqueuePublishStream({
       userId,
       tag: StreamTag.MIC,
       microphoneId,
       mute,
-      successCb: () => {
-        this.publishMicStreamSuccessHandler();
-      },
-      errorCb: (e) => {
-        this.publishMicStreamErrorHandler(e);
-      },
     });
-  }
-
-  publishMicStreamSuccessHandler() {
-    this.playStream({
-      successCb: () => {
-        const currentUser = this.state.users.find(u => u.userId === this.userId);
-        if (currentUser && currentUser.micOpen) {
-          this.setMicInterval();
-        }
-      },
-    });
-    this.publishMicStreamSuccessCbs.forEach(cb => {
-      cb && cb();
-    });
-    this.publishMicStreamSuccessCbs = [];
-  }
-
-  publishMicStreamErrorHandler(data) {
-    this.publishMicStreamErrorCbs.forEach(cb => {
-      cb && cb(data);
-    });
-    this.publishMicStreamErrorCbs = [];
   }
 
   switchMic(microphoneId) {

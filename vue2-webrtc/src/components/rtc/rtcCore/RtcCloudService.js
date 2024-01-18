@@ -25,11 +25,11 @@ class RtcCloudService {
   }
 
   publishMicStream(ops) {
-    this.rtcCloud.publishMicStream(ops);
+    return this.rtcCloud.publishMicStream(ops);
   }
 
   publishCameraStream(ops) {
-    this.rtcCloud.publishCameraStream(ops);
+    return this.rtcCloud.publishCameraStream(ops);
   }
 
   hasLocalStreamAudio() {

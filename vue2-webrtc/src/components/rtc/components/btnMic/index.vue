@@ -233,7 +233,7 @@ export default {
       this.visibleAudioTip = false;
       const hasMicAudio = rtcCore.hasLocalStreamAudio();
       if (hasMicAudio) {
-        const result = await rtcCore.setLocalStreamMute({
+        const result = rtcCore.setLocalStreamMute({
           tag: StreamTag.MIC,
           mute: this.storeRoom.currentUser?.micOpen,
         });
