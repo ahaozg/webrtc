@@ -147,21 +147,21 @@ export default {
           userId: this.storeRoom.roomInfo.userId,
           mute: this.storeRoom.currentUser?.cameraOpen,
           cameraId: rtcCore.state.camera.deviceId,
-          successCb: () => {
+        })
+          .then(() => {
             emitter.emit(RtcCoreEvents.SET_USER_INFO, {
               userId: this.storeRoom.roomInfo.userId,
               cameraOpen: !this.storeRoom.currentUser?.cameraOpen,
             });
-          },
-          errorCb: (e) => {
+          })
+          .catch((e) => {
             if (e.code === RoomErrorCode.LOCAL_STREAM_PUBLISHING) {
               emitter.emit(RtcCoreEvents.USER_TIP_MESSAGE, {
                 code: RoomErrorCode.LOCAL_STREAM_PUBLISHING,
                 message: RoomErrorMessage.LOCAL_STREAM_PUBLISHING,
               });
             }
-          },
-        });
+          });
       }
     },
   },

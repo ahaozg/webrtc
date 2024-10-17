@@ -1,10 +1,10 @@
 <template>
   <div class="rtc-wrap">
     <div class="model" v-if="!isPreData">
-      <input type="text" placeholder="sdkAppid" v-model="baseInfo.sdkAppid" @keydown.enter="judgeEnterRoom">
-      <input type="text" placeholder="secretkey" v-model="baseInfo.secretkey" @keydown.enter="judgeEnterRoom">
-      <input type="text" placeholder="房间号" v-model="baseInfo.roomId" @keydown.enter="judgeEnterRoom">
-      <input type="text" placeholder="userId" v-model="baseInfo.userId" @keydown.enter="judgeEnterRoom">
+      <input type="text" placeholder="sdkAppid" v-model.trim="baseInfo.sdkAppid" @keydown.enter="judgeEnterRoom">
+      <input type="text" placeholder="secretkey" v-model.trim="baseInfo.secretkey" @keydown.enter="judgeEnterRoom">
+      <input type="text" placeholder="房间号" v-model.trim="baseInfo.roomId" @keydown.enter="judgeEnterRoom">
+      <input type="text" placeholder="userId" v-model.trim="baseInfo.userId" @keydown.enter="judgeEnterRoom">
       <button @click="judgeEnterRoom">进入房间</button>
     </div>
     <ccRtc
@@ -194,6 +194,7 @@ export default {
     },
 
     judgeEnterRoom() {
+      this.baseInfo.sdkAppid = Number(this.baseInfo.sdkAppid);
       if (this.baseInfo.roomId && this.baseInfo.userId && this.baseInfo.sdkAppid && this.baseInfo.secretkey) {
         const basicInfo = getBasicInfo(this.baseInfo.sdkAppid, this.baseInfo.secretkey, this.baseInfo.userId);
         this.baseInfo = {...this.baseInfo, ...basicInfo};

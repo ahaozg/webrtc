@@ -6,7 +6,7 @@ import rtcCore from './rtcCore/index';
 
 import emitter, {UIEvents, RtcCoreEvents, RtcDeviceServiceEvents} from './common/emitter/event';
 import logger from './common/logger/index';
-import roomError from './common/room/error';
+import RtcError from './rtcCore/RtcError';
 import {RoomErrorCode, RoomErrorMessage} from './constants/constant';
 
 import svgAudioClose from './components/common/svg-audio-close';
@@ -312,7 +312,7 @@ export default {
       data = null,
     }) {
       logger.error(`${logPrefix}.emitError --> code：${code}  message：${code} data：`, data);
-      this.$emit(UIEvents.ERROR, roomError.error(code, message, data));
+      this.$emit(UIEvents.ERROR, RtcError.error(code, message, data));
     },
 
     /**
@@ -327,7 +327,7 @@ export default {
       message = '',
       data = null,
     }) {
-      this.$emit(UIEvents.SDK_ERROR, roomError.error(code, message, data));
+      this.$emit(UIEvents.SDK_ERROR, RtcError.error(code, message, data));
     },
 
     emitDeviceChange(deviceData) {

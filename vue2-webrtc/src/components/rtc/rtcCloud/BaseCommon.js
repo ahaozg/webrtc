@@ -2,6 +2,7 @@ import TRTC from 'trtc-js-sdk';
 import logger from '../common/logger';
 import {RoomErrorCode, RoomErrorMessage, StreamTag} from '../constants/constant';
 import {standardizationError} from '../utils/utils';
+import RtcError from '../rtcCore/RtcError';
 
 // 输出 DEBUG 以上日志等级
 TRTC.Logger.setLogLevel(TRTC.Logger.LogLevel.ERROR);
@@ -43,8 +44,6 @@ class BaseCommon {
       tag,
       microphoneId,
       cameraId,
-      videoProfile,
-      mute = true,
       audioSource,
       videoSource,
     } = params;
@@ -80,10 +79,7 @@ class BaseCommon {
           break;
         default:
           logger.error(`${logPrefix}.publishStream ${RoomErrorMessage.INVALID_PARAM_ERROR}`, params, tag);
-          throw {
-            code: RoomErrorCode.INVALID_PARAM_ERROR,
-            message: RoomErrorMessage.INVALID_PARAM_ERROR,
-          };
+          throw RtcError.error(RoomErrorCode.INVALID_PARAM_ERROR, RoomErrorMessage.INVALID_PARAM_ERROR);
       }
       const localStream = this.TRTC.createStream(config);
       const isError = await localStream.initialize()
@@ -91,90 +87,11 @@ class BaseCommon {
         .catch(e => {
           standardizationError(e);
           logger.error(`${logPrefix}.localStream.initialize() e`, e, e.code, e.message, e.name);
-          switch (e.name) {
-            case 'NotAllowedError':
-              // 提示用户：提示用户不授权摄像头/麦克风访问无法进行音视频通话
-              if (config.audio) {
-                return {
-                  code: RoomErrorCode.MIC_USER_DENY,
-                  message: RoomErrorMessage.MIC_USER_DENY,
-                  data: e,
-                };
-              } else if (config.video) {
-                return {
-                  code: RoomErrorCode.CAMERA_USER_DENY,
-                  message: RoomErrorMessage.CAMERA_USER_DENY,
-                  data: e,
-                };
-              }
-              return {
-                code: RoomErrorCode.CAMERA_MIC_USER_DENY,
-                message: RoomErrorMessage.CAMERA_MIC_USER_DENY,
-                data: e,
-              };
-            case 'NotReadableError':
-              // 提示用户：暂时无法访问摄像头/麦克风，请确保当前没有其他应用请求访问摄像头/麦克风，并重试。
-              if (config.audio) {
-                return {
-                  code: RoomErrorCode.MIC_IN_USER,
-                  message: RoomErrorMessage.MIC_IN_USER,
-                  data: e,
-                };
-              } else if (config.video) {
-                return {
-                  code: RoomErrorCode.CAMERA_IN_USER,
-                  message: RoomErrorMessage.CAMERA_IN_USER,
-                  data: e,
-                };
-              }
-              return {
-                code: RoomErrorCode.CAMERA_MIC_IN_USER,
-                message: RoomErrorMessage.CAMERA_MIC_IN_USER,
-                data: e,
-              };
-            case 'RtcError':
-              // DEVICE_NOT_FOUND
-              // eslint-disable-next-line no-magic-numbers
-              if (e.getCode() === 4099) {
-                // 当前设备没有麦克风或没有摄像头，但尝试采集麦克风、摄像头。
-                // 处理建议：引导用户检查设备的摄像头及麦克风是否正常，业务侧应在进房前的进行设备检测。
-                if (config.audio) {
-                  return {
-                    code: RoomErrorCode.NOT_FOUND_MIC_ERROR,
-                    message: RoomErrorMessage.NOT_FOUND_MIC_ERROR,
-                    data: e,
-                  };
-                } else if (config.video) {
-                  return {
-                    code: RoomErrorCode.NOT_FOUND_CAMERA_ERROR,
-                    message: RoomErrorMessage.NOT_FOUND_CAMERA_ERROR,
-                    data: e,
-                  };
-                }
-                return {
-                  code: RoomErrorCode.NOT_FOUND_DEVICE_ERROR,
-                  message: RoomErrorMessage.NOT_FOUND_DEVICE_ERROR,
-                  data: e,
-                };
-              }
-              return {
-                code: RoomErrorCode.UNKNOWN_ERROR,
-                message: RoomErrorMessage.UNKNOWN_ERROR,
-                data: e,
-              };
-            default:
-              return {
-                code: RoomErrorCode.UNKNOWN_ERROR,
-                message: RoomErrorMessage.UNKNOWN_ERROR,
-                data: e,
-              };
-          }
+          return this.streamInitializeError(e, e.name, config);
         });
       if (isError) {
         logger.error(`${logPrefix}.localStream.initialize()`, isError);
-        // return reject(isError);
-        // throw isError;
-        throw Object.assign(new Error(isError.message), isError);
+        throw RtcError.error(isError.code, isError.message, isError.data);
       }
       if (!this.localStream) {
         logger.log(`${logPrefix}.publish 开始发布`, params.tag);
@@ -192,8 +109,7 @@ class BaseCommon {
           .then(() => false)
           .catch(e => e);
         if (isErr) {
-          // return reject(isErr);
-          throw isErr;
+          throw RtcError.error(isErr.code, isErr.message, isErr.data);
         }
       }
       this.setLocalStreamMute(params);
@@ -211,13 +127,7 @@ class BaseCommon {
             logger.error(`${logPrefix}.publish 发布失败`, params.tag, e);
             this.localStreamPublishState = false;
             this.localStreamPublishing = false;
-            const reason = {
-              code: RoomErrorCode.LOCAL_STREAM_PUBLISH_ERROR,
-              message: RoomErrorMessage.LOCAL_STREAM_PUBLISH_ERROR,
-              data: e,
-            };
-            // reject(reason);
-            throw reason;
+            throw RtcError.error(RoomErrorCode.LOCAL_STREAM_PUBLISH_ERROR, RoomErrorMessage.LOCAL_STREAM_PUBLISH_ERROR, e);
           });
       }
       this.localStreamPublishing = false;
@@ -225,16 +135,81 @@ class BaseCommon {
     } catch (e) {
       logger.error(`${logPrefix}.publishStream try catch`, params, e);
       if (e.code && e.message) {
-        throw e;
+        throw RtcError.error(e.code, e.message, e.data);
       }
       standardizationError(e);
       this.localStreamPublishing = false;
-      throw {
+      throw RtcError.error(RoomErrorCode.UNKNOWN_ERROR, RoomErrorMessage.UNKNOWN_ERROR, e);
+    }
+  }
+
+  streamInitializeError(config, errorType, e) {
+    const errorMap = {
+      NotAllowedError: {
+        code: config.audio
+          ? config.video
+            ? RoomErrorCode.CAMERA_MIC_USER_DENY
+            : RoomErrorCode.MIC_USER_DENY
+          : config.video
+            ? RoomErrorCode.CAMERA_USER_DENY
+            : RoomErrorCode.UNKNOWN_ERROR,
+        message: config.audio
+          ? config.video
+            ? RoomErrorMessage.CAMERA_MIC_USER_DENY
+            : RoomErrorMessage.MIC_USER_DENY
+          : config.video
+            ? RoomErrorMessage.CAMERA_USER_DENY
+            : RoomErrorMessage.UNKNOWN_ERROR,
+      },
+      NotReadableError: {
+        code: config.audio
+          ? config.video
+            ? RoomErrorCode.CAMERA_MIC_IN_USER
+            : RoomErrorCode.MIC_IN_USER
+          : config.video
+            ? RoomErrorCode.CAMERA_IN_USER
+            : RoomErrorCode.UNKNOWN_ERROR,
+        message: config.audio
+          ? config.video
+            ? RoomErrorMessage.CAMERA_MIC_IN_USER
+            : RoomErrorMessage.MIC_IN_USER
+          : config.video
+            ? RoomErrorMessage.CAMERA_IN_USER
+            : RoomErrorMessage.UNKNOWN_ERROR,
+      },
+      RtcError: {
+        // eslint-disable-next-line no-magic-numbers
+        code: e.getCode() === 4099
+          ? config.audio
+            ? config.video
+              ? RoomErrorCode.NOT_FOUND_DEVICE_ERROR
+              : RoomErrorCode.NOT_FOUND_MIC_ERROR
+            : config.video
+              ? RoomErrorCode.NOT_FOUND_CAMERA_ERROR
+              : RoomErrorCode.UNKNOWN_ERROR
+          : RoomErrorCode.UNKNOWN_ERROR,
+        // eslint-disable-next-line no-magic-numbers
+        message: e.getCode() === 4099
+          ? config.audio
+            ? config.video
+              ? RoomErrorMessage.NOT_FOUND_DEVICE_ERROR
+              : RoomErrorMessage.NOT_FOUND_MIC_ERROR
+            : config.video
+              ? RoomErrorMessage.NOT_FOUND_CAMERA_ERROR
+              : RoomErrorMessage.UNKNOWN_ERROR
+          : RoomErrorMessage.UNKNOWN_ERROR,
+      },
+      default: {
         code: RoomErrorCode.UNKNOWN_ERROR,
         message: RoomErrorMessage.UNKNOWN_ERROR,
-        data: e,
-      };
-    }
+      },
+    };
+    const {code, message} = errorMap[errorType] || errorMap.default;
+    return {
+      code,
+      message,
+      data: e,
+    };
   }
 
   updateLocalStream(params) {
@@ -262,12 +237,9 @@ class BaseCommon {
   }
 
   updateLocalStreamDone({newTrack, isAudio, isVideo}, resolve, reject) {
-    if (!this.localStream) {
+    if (this.localStream) {
       logger.error(`${logPrefix}.updateLocalStream localStream不能为null`);
-      reject({
-        code: RoomErrorCode.LOCAL_STREAM_UPDATE_ERROR,
-        message: RoomErrorMessage.LOCAL_STREAM_UPDATE_ERROR,
-      });
+      reject(RtcError.error(RoomErrorCode.LOCAL_STREAM_UPDATE_ERROR, RoomErrorMessage.LOCAL_STREAM_UPDATE_ERROR));
       return;
     }
     let fn = '';
@@ -290,18 +262,11 @@ class BaseCommon {
         .catch(err => {
           standardizationError(err);
           logger.error(`${logPrefix}.updateLocalStream 更新失败`, {newTrack, isAudio, isVideo}, err);
-          reject({
-            code: RoomErrorCode.LOCAL_STREAM_UPDATE_ERROR,
-            message: RoomErrorMessage.LOCAL_STREAM_UPDATE_ERROR,
-            data: err,
-          });
+          reject(RtcError.error(RoomErrorCode.LOCAL_STREAM_UPDATE_ERROR, RoomErrorMessage.LOCAL_STREAM_UPDATE_ERROR, err));
         });
     } else {
       logger.error(`${logPrefix}.updateLocalStream 参数异常`, {newTrack, isAudio, isVideo});
-      reject({
-        code: RoomErrorCode.INVALID_PARAM_ERROR,
-        message: RoomErrorMessage.INVALID_PARAM_ERROR,
-      });
+      reject(RtcError.error(RoomErrorCode.INVALID_PARAM_ERROR, RoomErrorMessage.INVALID_PARAM_ERROR));
     }
   }
 

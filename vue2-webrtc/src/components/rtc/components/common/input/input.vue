@@ -36,6 +36,7 @@
 
 <script>
 import {isKorean} from '../../../utils/utils';
+
 export default {
   inheritAttrs: false,
   name: 'cc-input',
@@ -183,6 +184,7 @@ export default {
   border-radius: 2px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   background-color: transparent;
+
   &:hover,
   &:focus,
   &.is-focus {
@@ -191,6 +193,7 @@ export default {
 
   &.disabled {
     border-color: rgba(255, 255, 255, 0.25);
+
     .cc-input__inner {
       cursor: not-allowed;
     }

@@ -253,21 +253,21 @@ export default {
           userId: this.storeRoom.roomInfo.userId,
           mute: this.storeRoom.currentUser?.micOpen,
           microphoneId: rtcCore.state.microphone.deviceId,
-          successCb: () => {
+        })
+          .then(() => {
             emitter.emit(RtcCoreEvents.SET_USER_INFO, {
               userId: this.storeRoom.roomInfo.userId,
               micOpen: !this.storeRoom.currentUser?.micOpen,
             });
-          },
-          errorCb: (e) => {
+          })
+          .catch(e => {
             if (e.code === RoomErrorCode.LOCAL_STREAM_PUBLISHING) {
               emitter.emit(RtcCoreEvents.USER_TIP_MESSAGE, {
                 code: RoomErrorCode.LOCAL_STREAM_PUBLISHING,
                 message: RoomErrorMessage.LOCAL_STREAM_PUBLISHING,
               });
             }
-          },
-        });
+          });
       }
     },
   },
