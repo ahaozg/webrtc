@@ -121,6 +121,12 @@ export default {
   },
   mounted() {
     // mounted
+    window.addEventListener('keydown', (e) => {
+      // 回车
+      if (e.code === 'Enter' && !this.isPreData) {
+        this.judgeEnterRoom();
+      }
+    });
   },
   beforeDestroy() {
     // beforeDestroy

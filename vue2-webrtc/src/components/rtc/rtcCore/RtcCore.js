@@ -109,7 +109,7 @@ class RtcCore {
         this.state.joinRoomSuccess = true;
         resolve();
         if (this.state.enableMic && this.state.microphone.has) {
-          await this.publishMicStream({
+          this.publishMicStream({
             userId: this.state.userId,
             microphoneId: this.state.microphone.deviceId,
           })
@@ -118,7 +118,7 @@ class RtcCore {
             });
         }
         if (this.state.enableCamera && this.state.camera.has) {
-          await this.publishCameraStream({
+          this.publishCameraStream({
             userId: this.state.userId,
             cameraId: this.state.camera.deviceId,
           })

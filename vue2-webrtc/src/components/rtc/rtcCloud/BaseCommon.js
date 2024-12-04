@@ -20,7 +20,6 @@ class BaseCommon {
 
   localStream = null;
   localStreamPublishState = false;
-  localStreamPublishing = false;
   shareStream = null;
 
   remoteStreams = new Map();
@@ -29,13 +28,10 @@ class BaseCommon {
     return await this.TRTC.checkSystemRequirements();
   }
 
-  publishStreamQueue = Promise.resolve();
+  publishStreamPromise = Promise.resolve();
   enqueuePublishStream(params) {
-    const result = this.publishStreamQueue.then(() => this.publishStream(params));
-    this.publishStreamQueue = result.catch(() => {
-      //
-    });
-    return result;
+    this.publishStreamPromise = this.publishStreamPromise.then(() => this.publishStream(params));
+    return this.publishStreamPromise;
   }
 
   async publishStream(params) {
@@ -49,10 +45,6 @@ class BaseCommon {
     } = params;
     try {
       logger.log(`${logPrefix}.publishStream`, params);
-      if (this.localStreamPublishing) {
-        return;
-      }
-      this.localStreamPublishing = true;
       const config = {userId};
       for (const key in params) {
         const keys = ['audio', 'video', 'audioSource', 'videoSource'];
@@ -118,29 +110,23 @@ class BaseCommon {
           .then(() => {
             logger.log(`${logPrefix}.publish 发布成功`, params.tag);
             this.localStreamPublishState = true;
-            this.localStreamPublishing = false;
-            console.log('resolve !!!');
-            // resolve();
           })
           .catch(e => {
             standardizationError(e);
             logger.error(`${logPrefix}.publish 发布失败`, params.tag, e);
             this.localStreamPublishState = false;
-            this.localStreamPublishing = false;
             throw RtcError.error(RoomErrorCode.LOCAL_STREAM_PUBLISH_ERROR, RoomErrorMessage.LOCAL_STREAM_PUBLISH_ERROR, e);
           });
       }
-      this.localStreamPublishing = false;
-      console.log('end!!!');
     } catch (e) {
       logger.error(`${logPrefix}.publishStream try catch`, params, e);
       if (e.code && e.message) {
         throw RtcError.error(e.code, e.message, e.data);
       }
       standardizationError(e);
-      this.localStreamPublishing = false;
       throw RtcError.error(RoomErrorCode.UNKNOWN_ERROR, RoomErrorMessage.UNKNOWN_ERROR, e);
     }
+    logger.log(`${logPrefix}.publish end!`, params);
   }
 
   streamInitializeError(config, errorType, e) {
@@ -178,6 +164,7 @@ class BaseCommon {
             : RoomErrorMessage.UNKNOWN_ERROR,
       },
       RtcError: {
+        // 当前设备没有麦克风或没有摄像头，但尝试采集麦克风、摄像头。
         // eslint-disable-next-line no-magic-numbers
         code: e.getCode() === 4099
           ? config.audio
@@ -237,7 +224,7 @@ class BaseCommon {
   }
 
   updateLocalStreamDone({newTrack, isAudio, isVideo}, resolve, reject) {
-    if (this.localStream) {
+    if (!this.localStream) {
       logger.error(`${logPrefix}.updateLocalStream localStream不能为null`);
       reject(RtcError.error(RoomErrorCode.LOCAL_STREAM_UPDATE_ERROR, RoomErrorMessage.LOCAL_STREAM_UPDATE_ERROR));
       return;
@@ -303,11 +290,11 @@ class BaseCommon {
     const isAudio = tag === StreamTag.MIC || (tag === StreamTag.CUSTOM && audioSource);
     const isVideo = tag === StreamTag.CAMERA || (tag === StreamTag.CUSTOM && videoSource);
     if (isAudio) {
-      logger.log(`${logPrefix}.setLocalStreamMute 音频 ${mute ? '禁音频' : '取消禁音频'}`);
+      logger.log(`${logPrefix}.setLocalStreamMute 音频 ${mute ? '禁音频' : '打开音频'}`);
       mute ? this.localStream.muteAudio() : this.localStream.unmuteAudio();
     }
     if (isVideo) {
-      logger.log(`${logPrefix}.setLocalStreamMute 视频 ${mute ? '禁视频' : '取消禁视频'}`);
+      logger.log(`${logPrefix}.setLocalStreamMute 视频 ${mute ? '禁视频' : '打开视频'}`);
       mute ? this.localStream.muteVideo() : this.localStream.unmuteVideo();
     }
     return true;
